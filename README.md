@@ -42,6 +42,7 @@ python build_exe.py
 ## Item Search
 
 The item market supports enchant syntax:
+Examples🔽🔽🔽
 - `bow .2` — Find T4 Bow Enchant 2
 - `bow@2` — Same, using @ syntax
 - `bow enchant 2` — Same, using full text
