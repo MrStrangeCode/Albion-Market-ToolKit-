@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albion Online Toolkit</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/static/icons/appicon.svg">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h1>⚔️ AOT</h1>
+                <p class="sidebar-subtitle">Albion Online Toolkit</p>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span> Dashboard
+                </li>
+                <li class="nav-item" data-page="history">
+                    <span class="nav-icon">📈</span> Price History
+                </li>
+                <li class="nav-item" data-page="profit">
+                    <span class="nav-icon">💰</span> Profit Finder
+                </li>
+                <li class="nav-item" data-page="crafting">
+                    <span class="nav-icon">🔨</span> Craft Calculator
+                </li>
+                <li class="nav-item" data-page="gold">
+                    <span class="nav-icon">🪙</span> Gold Tracker
+                </li>
+                <li class="nav-item" data-page="watcher">
+                    <span class="nav-icon">👁️</span> Flip Watcher
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="server-select">
+                    <label>Server:</label>
+                    <select id="server-select">
+                        <option value="west">West (Americas)</option>
+                        <option value="east">East (Asia)</option>
+                        <option value="europe">Europe</option>
+                    </select>
+                </div>
+                <p class="disclaimer">Not affiliated with Albion Online</p>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Dashboard Page -->
+            <section id="page-dashboard" class="page active">
+                <div class="page-header">
+                    <h2>📊 Market Dashboard</h2>
+                    <button class="btn btn-primary" id="refresh-dashboard">🔄 Refresh</button>
+                </div>
+                <div class="dashboard-controls">
+                    <div class="control-group">
+                        <label>Category:</label>
+                        <select id="dash-category">
+                            <option value="bags">Bags</option>
+                            <option value="capes">Capes</option>
+                            <option value="weapons_swords">Swords</option>
+                            <option value="weapons_axes">Axes</option>
+                            <option value="weapons_bows">Bows</option>
+                            <option value="weapons_staves">Staves</option>
+                            <option value="weapons_hammers">Hammers</option>
+                            <option value="weapons_maces">Maces</option>
+                            <option value="weapons_daggers">Daggers</option>
+                            <option value="weapons_spears">Spears</option>
+                            <option value="armor_cloth">Cloth Armor</option>
+                            <option value="armor_leather">Leather Armor</option>
+                            <option value="armor_plate">Plate Armor</option>
+                            <option value="resources_wood">Wood</option>
+                            <option value="resources_rock">Stone</option>
+                            <option value="resources_fiber">Fiber</option>
+                            <option value="resources_hide">Hide</option>
+                            <option value="resources_ore">Ore</option>
+                            <option value="mounts">Mounts</option>
+                            <option value="consumables">Consumables</option>
+                            <option value="artifacts">Artifacts</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Quality:</label>
+                        <select id="dash-quality">
+                            <option value="1">Normal</option>
+                            <option value="2">Good</option>
+                            <option value="3">Outstanding</option>
+                            <option value="4">Excellent</option>
+                            <option value="5">Masterpiece</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="dashboard-grid" id="dashboard-grid">
+                    <div class="loading">Loading market data</div>
+                </div>
+            </section>
+
+            <!-- Price History Page -->
+            <section id="page-history" class="page">
+                <div class="page-header">
+                    <h2>📈 Price History Explorer</h2>
+                </div>
+                <div class="controls-bar">
+                    <div class="item-input-wrapper">
+                        <div class="control-group">
+                            <label>Search Item:</label>
+                            <input type="text" id="history-item-input" placeholder="Click the 🔍 button to search items..." readonly>
+                            <div class="item-preview" id="history-item-preview" style="display:none;"></div>
+                        </div>
+                        <button class="item-search-btn" id="history-search-item-btn" title="Search items">🔍</button>
+                        <button class="btn btn-primary" id="history-fetch-btn" style="align-self:flex-end">Search</button>
+                    </div>
+                    <div class="control-group">
+                        <label>City:</label>
+                        <select id="history-city"></select>
+                    </div>
+                    <div class="control-group">
+                        <label>Range:</label>
+                        <select id="history-range">
+                            <option value="7">7 Days</option>
+                            <option value="14">14 Days</option>
+                            <option value="30" selected>30 Days</option>
+                            <option value="60">60 Days</option>
+                            <option value="90">90 Days</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Quality:</label>
+                        <select id="history-quality">
+                            <option value="1">Normal</option>
+                            <option value="2">Good</option>
+                            <option value="3">Outstanding</option>
+                            <option value="4">Excellent</option>
+                            <option value="5">Masterpiece</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="price-chart"></canvas>
+                </div>
+                <div id="history-stats" class="stats-row" style="display:none;">
+                    <div class="stat-card"><span class="stat-label">Latest Price</span><span class="stat-value" id="stat-latest">-</span></div>
+                    <div class="stat-card"><span class="stat-label">Lowest</span><span class="stat-value" id="stat-low">-</span></div>
+                    <div class="stat-card"><span class="stat-label">Highest</span><span class="stat-value" id="stat-high">-</span></div>
+                    <div class="stat-card"><span class="stat-label">Average</span><span class="stat-value" id="stat-avg">-</span></div>
+                </div>
+            </section>
+
+            <!-- Profit Finder Page -->
+            <section id="page-profit" class="page">
+                <div class="page-header">
+                    <h2>💰 Profit Finder / Trade Routes</h2>
+                    <button class="btn btn-primary" id="scan-profit-btn">🔍 Scan Markets</button>
+                </div>
+                <div class="controls-bar">
+                    <div class="control-group">
+                        <label>Items to Scan:</label>
+                        <select id="profit-category">
+                            <option value="all" selected>All Categories</option>
+                            <option value="bags">Bags</option>
+                            <option value="capes">Capes</option>
+                            <option value="weapons_swords">Swords</option>
+                            <option value="weapons_axes">Axes</option>
+                            <option value="weapons_bows">Bows</option>
+                            <option value="weapons_staves">Staves</option>
+                            <option value="weapons_hammers">Hammers</option>
+                            <option value="weapons_maces">Maces</option>
+                            <option value="weapons_daggers">Daggers</option>
+                            <option value="weapons_spears">Spears</option>
+                            <option value="armor_cloth">Cloth Armor</option>
+                            <option value="armor_leather">Leather Armor</option>
+                            <option value="armor_plate">Plate Armor</option>
+                            <option value="mounts">Mounts</option>
+                            <option value="consumables">Consumables</option>
+                            <option value="artifacts">Artifacts</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Quality:</label>
+                        <select id="profit-quality">
+                            <option value="1" selected>Normal</option>
+                            <option value="2">Good</option>
+                            <option value="3">Outstanding</option>
+                            <option value="4">Excellent</option>
+                            <option value="5">Masterpiece</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Min Profit:</label>
+                        <input type="number" id="profit-min" value="1000" min="0" step="100">
+                    </div>
+                </div>
+                <div id="profit-results">
+                    <div class="loading-message">Click "Scan Markets" to find profitable trade opportunities.</div>
+                </div>
+            </section>
+
+            <!-- Crafting Calculator Page -->
+            <section id="page-crafting" class="page">
+                <div class="page-header">
+                    <h2>🔨 Crafting Cost Calculator</h2>
+                    <button class="btn btn-primary" id="calc-craft-btn">🔄 Calculate</button>
+                </div>
+                <div class="controls-bar">
+                    <div class="item-input-wrapper">
+                        <div class="control-group">
+                            <label>Search Item:</label>
+                            <input type="text" id="craft-item-input" placeholder="Click the 🔍 button to search items..." readonly>
+                            <div class="item-preview" id="craft-item-preview" style="display:none;"></div>
+                        </div>
+                        <button class="item-search-btn" id="craft-search-item-btn" title="Search items">🔍</button>
+                    </div>
+                    <div class="control-group">
+                        <label>City (Buy Materials):</label>
+                        <select id="craft-buy-city"></select>
+                    </div>
+                    <div class="control-group">
+                        <label>City (Sell Product):</label>
+                        <select id="craft-sell-city"></select>
+                    </div>
+                    <div class="control-group">
+                        <label>Craft Bonus %:</label>
+                        <input type="number" id="craft-bonus" value="0" min="0" max="45">
+                    </div>
+                </div>
+                <div id="craft-results" style="display:none;">
+                    <h3>Crafting Breakdown</h3>
+                    <table class="data-table" id="craft-table">
+                        <thead><tr><th>Material</th><th>Tier</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+                        <tbody></tbody><tfoot></tfoot>
+                    </table>
+                    <div class="stats-row" id="craft-stats"></div>
+                </div>
+            </section>
+
+            <!-- Gold Tracker Page -->
+            <section id="page-gold" class="page">
+                <div class="page-header">
+                    <h2>🪙 Gold Price Tracker</h2>
+                    <button class="btn btn-primary" id="refresh-gold-btn">🔄 Refresh</button>
+                </div>
+                <div class="controls-bar">
+                    <div class="control-group">
+                        <label>Range:</label>
+                        <select id="gold-range">
+                            <option value="1">1 Day (24 points)</option>
+                            <option value="3">3 Days (72 points)</option>
+                            <option value="7" selected>7 Days (168 points)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container"><canvas id="gold-chart"></canvas></div>
+                <div id="gold-stats" class="stats-row" style="display:none;">
+                    <div class="stat-card"><span class="stat-label">Latest Price</span><span class="stat-value" id="gold-stat-latest">-</span></div>
+                    <div class="stat-card"><span class="stat-label">Period Low</span><span class="stat-value" id="gold-stat-low">-</span></div>
+                    <div class="stat-card"><span class="stat-label">Period High</span><span class="stat-value" id="gold-stat-high">-</span></div>
+                </div>
+            </section>
+
+            <!-- Flip Watcher Page -->
+            <section id="page-watcher" class="page">
+                <div class="page-header">
+                    <h2>👁️ Flip Watcher</h2>
+                    <button class="btn btn-primary" id="watcher-scan-btn">🔍 Scan Now</button>
+                </div>
+                <div class="controls-bar">
+                    <div class="control-group">
+                        <label>Watch Category:</label>
+                        <select id="watcher-category">
+                            <option value="bags">Bags</option>
+                            <option value="capes">Capes</option>
+                            <option value="weapons_swords">Swords</option>
+                            <option value="weapons_axes">Axes</option>
+                            <option value="weapons_bows">Bows</option>
+                            <option value="weapons_staves">Staves</option>
+                            <option value="weapons_hammers">Hammers</option>
+                            <option value="weapons_maces">Maces</option>
+                            <option value="weapons_daggers">Daggers</option>
+                            <option value="weapons_spears">Spears</option>
+                            <option value="armor_cloth">Cloth Armor</option>
+                            <option value="armor_leather">Leather Armor</option>
+                            <option value="armor_plate">Plate Armor</option>
+                            <option value="mounts">Mounts</option>
+                            <option value="consumables">Consumables</option>
+                            <option value="artifacts">Artifacts</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Min Margin %:</label>
+                        <input type="number" id="watcher-margin" value="15" min="1">
+                    </div>
+                    <div class="control-group">
+                        <label>Quality:</label>
+                        <select id="watcher-quality">
+                            <option value="1" selected>Normal</option>
+                            <option value="2">Good</option>
+                            <option value="3">Outstanding</option>
+                            <option value="4">Excellent</option>
+                            <option value="5">Masterpiece</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="watcher-results">
+                    <div class="loading-message">Click "Scan Now" to find high-margin flip opportunities.</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Item Market Popup (shared across all pages) -->
+        <div class="item-market-overlay" id="item-market-overlay">
+            <div class="item-market">
+                <div class="market-header">
+                    <h3>🏪 Item Market</h3>
+                    <button class="market-close" id="market-close">&times;</button>
+                </div>
+                <div class="market-search-bar">
+                    <input type="text" class="market-search-input" id="market-search-input" placeholder="Search items... (try 'bow', 'bow .2', 'heal', 'T4_BAG')">
+                </div>
+                <div class="market-autocomplete" id="market-autocomplete" style="display:none;"></div>
+                <div class="market-filters" id="market-filters">
+                    <!-- Category buttons generated by JS -->
+                </div>
+                <div class="market-filters" id="market-tier-filters">
+                    <span style="font-size:0.75em;color:var(--text-muted);margin-right:4px;align-self:center;">Tier:</span>
+                    <button class="tier-btn active" data-tier="">All</button>
+                    <button class="tier-btn" data-tier="3">3</button>
+                    <button class="tier-btn" data-tier="4">4</button>
+                    <button class="tier-btn" data-tier="5">5</button>
+                    <button class="tier-btn" data-tier="6">6</button>
+                    <button class="tier-btn" data-tier="7">7</button>
+                    <button class="tier-btn" data-tier="8">8</button>
+                </div>
+                <div class="market-filters" id="market-enchant-filters">
+                    <!-- Enchant buttons generated by JS -->
+                </div>
+                <div class="market-items-grid" id="market-items-grid">
+                    <div class="market-empty">Type to search or select a category</div>
+                </div>
+                <div class="market-footer">
+                    <div class="market-selected-info" id="market-selected-info">Click an item to select it</div>
+                    <div>
+                        <button class="btn btn-sm" id="market-clear-btn">Clear</button>
+                        <button class="btn btn-sm btn-primary" id="market-select-btn" disabled>Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

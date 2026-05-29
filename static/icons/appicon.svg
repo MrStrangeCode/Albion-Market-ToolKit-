@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a241c"/>
+      <stop offset="100%" style="stop-color:#1a1612"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8c06a"/>
+      <stop offset="50%" style="stop-color:#d4a03a"/>
+      <stop offset="100%" style="stop-color:#c4882a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="120" fill="url(#bg)" stroke="url(#gold)" stroke-width="4"/>
+  <polygon points="122,40 134,40 134,160 122,160" fill="url(#gold)"/>
+  <polygon points="122,40 134,40 128,30" fill="url(#gold)"/>
+  <line x1="126" y1="45" x2="126" y2="155" stroke="#e8c06a" stroke-width="2" opacity="0.4"/>
+  <rect x="90" y="160" width="76" height="12" rx="3" fill="url(#gold)"/>
+  <circle cx="95" cy="166" r="4" fill="#a87acc"/>
+  <circle cx="161" cy="166" r="4" fill="#a87acc"/>
+  <rect x="118" y="172" width="20" height="30" rx="3" fill="url(#gold)"/>
+  <circle cx="128" cy="210" r="10" fill="url(#gold)"/>
+  <circle cx="128" cy="210" r="4" fill="#a87acc"/>
+</svg>
